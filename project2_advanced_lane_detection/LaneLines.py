@@ -95,6 +95,7 @@ class LaneLines:
         self.nonzerox = np.array(self.nonzero[1])
         self.nonzeroy = np.array(self.nonzero[0])
 
+
     def find_lane_pixels(self, img):
         """Find lane pixels from a binary warped image.
 
@@ -163,9 +164,6 @@ class LaneLines:
             self.left_fit = np.polyfit(lefty, leftx, 2)
         if len(righty) > 1500:
             self.right_fit = np.polyfit(righty, rightx, 2)
-            
-        # if self.left_fit == None:
-        #     return out_img
 
         # Generate x and y values for plotting
         maxy = img.shape[0] - 1
@@ -194,8 +192,10 @@ class LaneLines:
 
         return out_img
 
+
     def plot(self, out_img):
         np.set_printoptions(precision=6, suppress=True)
+        
         lR, rR, pos = self.measure_curvature()
 
         value = None
@@ -250,7 +250,7 @@ class LaneLines:
             fontFace=cv2.FONT_HERSHEY_SIMPLEX,
             fontScale=1.2,
             color=(0, 255, 0),
-            thickness=2)
+        thickness=2)
 
         cv2.putText(
             out_img,

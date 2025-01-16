@@ -21,7 +21,10 @@ class Thresholding:
     def __init__(self):
         pass
     
-    def forward(self, img):        
+    """
+    TODO: 둘 다 흰색 차선일 경우?
+    """
+    def forward(self, img):
         hls = cv2.cvtColor(img, cv2.COLOR_BGR2HSV) # HLS로 변환
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV) # HSV로 변환
         # h_channel = hls[:,:,0] # Hue 채널
@@ -29,18 +32,16 @@ class Thresholding:
         # s_channel = hls[:,:,2] # Saturation 채널
         # v_channel = hsv[:,:,2] # Value 채널
         
-        # # 오른쪽 차선 감지
+        # 오른쪽 차선 감지
         # right_lane = threshold_rel(l_channel, 0.8, 1.0) # 0.8~1.0 사이의 이진화된 이미지
         # right_lane[:,:750] = 0 # 열 ~749까지 0으로 만듬
         
-        # # 왼쪽 차선 감지
+        # 왼쪽 차선 감지
         # left_lane = threshold_abs(h_channel, 20, 30) # 20~30 사이의 이진화된 이미지
         # left_lane &= threshold_rel(v_channel, 0.7, 1.0) # 0.7~1.0 사이의 이진화된 이미지
         # left_lane[:,550:] = 0 # 열 550부터 0으로 만듬
         
         # img2 = left_lane | right_lane # 이미지를 하나로 합침(차선 결합)
-        
-        
         
         # 노란색 범위 정의 (범위는 조정 필요)
         lower_yellow = np.array([18, 80, 80])  # 예: 노란색 범위의 하한값
@@ -53,10 +54,12 @@ class Thresholding:
         lower_white = np.array([0, 0, 200])
         upper_white = np.array([180, 30, 255])
         white_mask = cv2.inRange(hsv, lower_white, upper_white)
+        
+        return yellow_mask | white_mask # 흑백사진으로 리턴
 
         # 흰색과 노란색 마스크 결합
-        combined_mask = cv2.bitwise_or(white_mask, yellow_mask)
-        filtered_image = cv2.bitwise_and(img, img, mask=combined_mask)
+        # combined_mask = cv2.bitwise_or(white_mask, yellow_mask)
+        # filtered_image = cv2.bitwise_and(img, img, mask=combined_mask)
         
         # cv2.imshow("img", img)
         # cv2.imshow("hls", hls)
@@ -65,4 +68,4 @@ class Thresholding:
         # cv2.imshow("yellow_mask", yellow_mask)
         # cv2.imshow("filtered_image", filtered_image)
         
-        return filtered_image
+        # return filtered_image
