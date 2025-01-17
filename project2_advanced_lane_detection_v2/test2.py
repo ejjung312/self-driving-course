@@ -1,0 +1,1 @@
+print(globals()['xm_per_pix'])
