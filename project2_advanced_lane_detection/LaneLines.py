@@ -147,6 +147,9 @@ class LaneLines:
             if len(good_right_x) > self.minpix:
                 rightx_current = np.int32(np.mean(good_right_x))
 
+        # print(len(leftx),len(lefty))
+        # print(len(rightx),len(righty))
+        
         return leftx, lefty, rightx, righty, out_img
 
     def fit_poly(self, img):
@@ -161,7 +164,7 @@ class LaneLines:
         leftx, lefty, rightx, righty, out_img = self.find_lane_pixels(img)
 
         if len(lefty) > 1500:
-            self.left_fit = np.polyfit(lefty, leftx, 2)
+            self.left_fit = np.polyfit(lefty, leftx, 2) # 2차식으로 회귀값 찾기
         if len(righty) > 1500:
             self.right_fit = np.polyfit(righty, rightx, 2)
 
@@ -231,10 +234,12 @@ class LaneLines:
             y, x = self.left_curve_img[:,:,3].nonzero()
             out_img[y, x-100+W//2] = self.left_curve_img[y, x, :3]
             msg = "Left Curve Ahead"
+        
         if direction == 'R':
             y, x = self.right_curve_img[:,:,3].nonzero()
             out_img[y, x-100+W//2] = self.right_curve_img[y, x, :3]
             msg = "Right Curve Ahead"
+        
         if direction == 'F':
             y, x = self.keep_straight_img[:,:,3].nonzero()
             out_img[y, x-100+W//2] = self.keep_straight_img[y, x, :3]

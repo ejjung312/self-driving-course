@@ -14,7 +14,8 @@ class FindLaneLines:
         self.thresholding = Thresholding()
         self.transform = PerspectiveTransformation()
         self.lanelines = LaneLines()
-        
+
+
     def forward(self, img):
         out_img = np.copy(img)        
         img = self.calibration.undistort(img) # 카메라 왜곡 펴기
@@ -23,19 +24,28 @@ class FindLaneLines:
         img = self.lanelines.forward(img)
         img = self.transform.backward(img)
         
-        out_img = cv2.addWeighted(out_img, 1, img, 0.6, 0)
+        out_img = cv2.addWeighted(out_img, 1, img, 0.6, 0) # 이미지 합성
         out_img = self.lanelines.plot(out_img)
         
         return out_img
         # return img
-    
+
+
     def process_image(self, input_path, output_path):
         img = mpimg.imread(input_path)
         out_img = self.forward(img)
         mpimg.imsave(output_path, out_img)
-    
-    def process_video(self, input_path, output_path):
+
+
+    def process_video(self, input_path):
         cap = cv2.VideoCapture(input_path)
+        
+        # success, img = cap.read()
+        # img = self.forward(img)
+        # cv2.imshow("Image", img)
+        # if cv2.waitKey(0) & 0xFF == ord('q'):
+        #     cap.release()
+        #     cv2.destroyAllWindows()
         
         while cap.isOpened():
             success, img = cap.read()
@@ -44,7 +54,7 @@ class FindLaneLines:
                 img = self.forward(img)
                 
                 cv2.imshow("Image", img)
-            
+                
                 if cv2.waitKey(30) & 0xFF == ord('q'):
                     break
 
@@ -53,12 +63,12 @@ class FindLaneLines:
 
 
 def main():
-    findLaneLines = FindLaneLines()
-    
     input = 'project2_advanced_lane_detection/test_videos/project_video.mp4'
-    output = 'project2_advanced_lane_detection/output_videos/result.mp4'
-    
-    findLaneLines.process_video(input, output)
+    # input = 'project2_advanced_lane_detection/test_videos/project_video2.mp4'
+    # input = 'project2_advanced_lane_detection/test_videos/challenge_video.mp4'
+
+    findLaneLines = FindLaneLines()
+    findLaneLines.process_video(input)
     # args = docopt(__doc__)
     # input = args['INPUT_PATH']
     # output = args['OUTPUT_PATH']
