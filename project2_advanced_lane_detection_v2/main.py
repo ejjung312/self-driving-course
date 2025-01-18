@@ -83,6 +83,7 @@ def process_pipeline(frame, keep_state=True):
     # 프레임 이진화 후 차선 라인 강조
     img_binary = binarize(img_undistorted, verbose=False)
     
+    # TODO - 여기서부터 분석
     # 원근 변환하여 상공에서 보는 관점을 얻음
     img_birdeye, M, Minv = birdeye(img_binary, verbose=False)
     
@@ -97,12 +98,13 @@ def process_pipeline(frame, keep_state=True):
     # draw the surface enclosed by lane lines back onto the original frame
     blend_on_road = draw_back_onto_the_road(img_undistorted, Minv, line_lt, line_rt, keep_state)
     
-    # stitch on the top of final output images from different steps of the pipeline
+    # 썸네일(이진화, 상공뷰, 상공뷰 차선라인)
     blend_output = prepare_out_blend_frame(blend_on_road, img_binary, img_birdeye, img_fit, line_lt, line_rt, offset_meter)
     
     processed_frames += 1
     
     return blend_output
+    # return blend_on_road
 
 
 if __name__ == '__main__':
@@ -113,40 +115,49 @@ if __name__ == '__main__':
     mode = 'video'
     
     if mode == 'video':
-        # input_path = 'project2_advanced_lane_detection_v2/test_videos/project_video.mp4'
+        input_path = 'project2_advanced_lane_detection_v2/test_videos/project_video.mp4'
         # input_path = 'project2_advanced_lane_detection_v2/test_videos/challenge_video.mp4'
-        input_path = 'project2_advanced_lane_detection_v2/test_videos/harder_challenge_video.mp4'
+        # input_path = 'project2_advanced_lane_detection_v2/test_videos/harder_challenge_video.mp4'
         
         cap = cv2.VideoCapture(input_path)
-        # 초당 프레임 수 및 프레임 크기 가져오기
-        fps = int(cap.get(cv2.CAP_PROP_FPS))
-        frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        frame_size = (frame_width, frame_height)
-        
-        # 비디오 작성 객체 생성 (코덱: MJPG)
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        out = cv2.VideoWriter('project2_advanced_lane_detection_v2/out_video3.mp4', fourcc, fps, frame_size)
-        
-        while cap.isOpened():
-            success, img = cap.read()
-            
-            if not success:
-                break
-            
-            img = process_pipeline(img, keep_state=False)
-            
-            cv2.imshow("Image", img)
-            
-            # 프레임 저장
-            out.write(img)
-            
-            if cv2.waitKey(int(1000 / fps)) & 0xFF == ord('q'):
-                break
-
-        cap.release()
-        out.release()
+        success, img = cap.read()
+        img = process_pipeline(img, keep_state=False)
+        cv2.imshow("Image", img)
+        cv2.waitKey(0)
         cv2.destroyAllWindows()
+        
+        
+        # cap = cv2.VideoCapture(input_path)
+        # # 초당 프레임 수 및 프레임 크기 가져오기
+        # fps = int(cap.get(cv2.CAP_PROP_FPS))
+        # frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        # frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        # frame_size = (frame_width, frame_height)
+        
+        # # 비디오 작성 객체 생성 (코덱: MJPG)
+        # fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        # out = cv2.VideoWriter('project2_advanced_lane_detection_v2/out_video3.mp4', fourcc, fps, frame_size)
+        
+        # while cap.isOpened():
+        #     success, img = cap.read()
+            
+        #     # 영상 끝나면 자동 종료
+        #     # if not success:
+        #     #     break
+            
+        #     img = process_pipeline(img, keep_state=False)
+            
+        #     cv2.imshow("Image", img)
+            
+        #     # 프레임 저장
+        #     out.write(img)
+            
+        #     if cv2.waitKey(int(1000 / fps)) & 0xFF == ord('q'):
+        #         break
+
+        # cap.release()
+        # out.release()
+        # cv2.destroyAllWindows()
         
     else:
         test_img_dir = 'project2_advanced_lane_detection_v2/test_images'

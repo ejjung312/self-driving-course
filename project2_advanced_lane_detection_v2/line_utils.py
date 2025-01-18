@@ -3,9 +3,7 @@ import numpy as np
 import glob
 import collections
 import matplotlib.pyplot as plt
-# from calibration_utils import calibrate_camera, undistort
-# from binarization_utils import binarize
-# from perspective_utils import birdeye
+
 from project2_advanced_lane_detection_v2.globals import ym_per_pix, xm_per_pix
 
 class Line:
@@ -217,9 +215,9 @@ def get_fits_by_previous_fits(birdeye_binary, line_lt, line_rt, verbose=False):
     nonzero_x = np.array(nonzero[1])
     margin = 100
     left_lane_inds = ((nonzero_x > (left_fit_pixel[0] * (nonzero_y ** 2) + left_fit_pixel[1] * nonzero_y + left_fit_pixel[2] - margin)) & 
-                    (nonzero_x < (left_fit_pixel[0] * (nonzero_y ** 2) + left_fit_pixel[1] * nonzero_y + left_fit_pixel[2] + margin)))
+                        (nonzero_x < (left_fit_pixel[0] * (nonzero_y ** 2) + left_fit_pixel[1] * nonzero_y + left_fit_pixel[2] + margin)))
     right_lane_inds = ((nonzero_x > (right_fit_pixel[0] * (nonzero_y ** 2) + right_fit_pixel[1] * nonzero_y + right_fit_pixel[2] - margin)) & 
-                    (nonzero_x < (right_fit_pixel[0] * (nonzero_y ** 2) + right_fit_pixel[1] * nonzero_y + right_fit_pixel[2] + margin)))
+                        (nonzero_x < (right_fit_pixel[0] * (nonzero_y ** 2) + right_fit_pixel[1] * nonzero_y + right_fit_pixel[2] + margin)))
     
     # 차선이 있는 위치의 픽셀 추출
     line_lt.all_x, line_lt.all_y = nonzero_x[left_lane_inds], nonzero_y[left_lane_inds]
@@ -302,7 +300,7 @@ def draw_back_onto_the_road(img_undistorted, Minv, line_lt, line_rt, keep_state)
     pts_left = np.array([np.transpose(np.vstack([left_fitx, ploty]))])
     pts_right = np.array([np.flipud(np.transpose(np.vstack([right_fitx, ploty])))])
     pts = np.hstack((pts_left, pts_right))
-    cv2.fillPoly(road_warp, np.int_([pts]), (0, 255, 0))
+    cv2.fillPoly(road_warp, np.int_([pts]), (0, 255, 255))
     road_dewarped = cv2.warpPerspective(road_warp, Minv, (width, height))  # Warp back to original image space
     
     blend_onto_road = cv2.addWeighted(img_undistorted, 1., road_dewarped, 0.3, 0)
