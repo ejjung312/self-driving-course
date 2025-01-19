@@ -62,11 +62,17 @@ def compute_offset_from_center(line_lt, line_rt, frame_width):
     of the image of the two lane-lines detected.
     """
     if line_lt.detected and line_rt.detected:
-        line_lt_bottom = np.mean(line_lt.all_x[line_lt.all_y > 0.95 * line_lt.all_y.max()])
-        line_rt_bottom = np.mean(line_rt.all_x[line_rt.all_y > 0.95 * line_rt.all_y.max()])
+        # 탐지된 y 좌표들 중 최댓값, 즉 이미지에서 차선의 가장 아래쪽(하단)을 나타냄 => 버드아이뷰에서는 보통 y값이 클수록 아래쪽을 의미
+        # 가장 큰 값의 95% 이상인 y 좌표들을 선택해서 x값을 구한 후 평균을 구함
+        line_lt_bottom = np.mean(line_lt.all_x[line_lt.all_y > (0.95 * line_lt.all_y.max())])
+        line_rt_bottom = np.mean(line_rt.all_x[line_rt.all_y > (0.95 * line_rt.all_y.max())])
+        # 차선의 너비
         lane_width = line_rt_bottom - line_lt_bottom
         midpoint = frame_width / 2
+        # (왼쪽 차선의 위치 + 왼쪽 차선과 오른쪽 차선의 중앙 지점) - 차량의 중앙 x 좌표 ==> 차량의 중심이 도로 중앙에서 얼마나 벗어나 있는지(픽셀)
         offset_pix = abs((line_lt_bottom + lane_width / 2) - midpoint)
+
+        # 차량의 중심이 도로 중앙에서 얼마나 벗어나 있는지 미터로 환산
         offset_meter = xm_per_pix * offset_pix
     else:
         offset_meter = -1
@@ -82,11 +88,11 @@ def process_pipeline(frame, keep_state=True):
     
     # 프레임 이진화 후 차선 라인 강조
     img_binary = binarize(img_undistorted, verbose=False)
-    
-    # TODO - 여기서부터 분석
+
     # 원근 변환하여 상공에서 보는 관점을 얻음
     img_birdeye, M, Minv = birdeye(img_binary, verbose=False)
     
+    # TODO - 둘의 차이가 뭔가
     # 2차원 다항식 곡선 그리기
     if processed_frames > 0 and keep_state and line_lt.detected and line_rt.detected:
         line_lt, line_rt, img_fit = get_fits_by_previous_fits(img_birdeye, line_lt, line_rt, verbose=False)
@@ -95,7 +101,7 @@ def process_pipeline(frame, keep_state=True):
 
     offset_meter = compute_offset_from_center(line_lt, line_rt, frame_width=frame.shape[1])
     
-    # draw the surface enclosed by lane lines back onto the original frame
+    # 이미지에 차선과 차선영역 그리기
     blend_on_road = draw_back_onto_the_road(img_undistorted, Minv, line_lt, line_rt, keep_state)
     
     # 썸네일(이진화, 상공뷰, 상공뷰 차선라인)
@@ -140,23 +146,25 @@ if __name__ == '__main__':
         
         # while cap.isOpened():
         #     success, img = cap.read()
-            
+        #
         #     # 영상 끝나면 자동 종료
-        #     # if not success:
-        #     #     break
-            
-        #     img = process_pipeline(img, keep_state=False)
-            
-        #     cv2.imshow("Image", img)
-            
-        #     # 프레임 저장
-        #     out.write(img)
-            
-        #     if cv2.waitKey(int(1000 / fps)) & 0xFF == ord('q'):
+        #     if not success:
         #         break
-
+        #
+        #     # img = process_pipeline(img, keep_state=False)
+        #     img = process_pipeline(img, keep_state=True)
+        #
+        #     cv2.imshow("Image", img)
+        #
+        #     # 프레임 저장
+        #     # out.write(img)
+        #
+        #     # if cv2.waitKey(int(1000 / fps)) & 0xFF == ord('q'):
+        #     if cv2.waitKey(25) & 0xFF == ord('q'):
+        #         break
+        #
         # cap.release()
-        # out.release()
+        # # out.release()
         # cv2.destroyAllWindows()
         
     else:

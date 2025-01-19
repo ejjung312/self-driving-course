@@ -20,10 +20,13 @@ def birdeye(img, verbose=False):
                     [0, 0],       # tl
                     [w, 0]])      # tr
 
+    # 이미지를 일부분을 펼치거나 좁힘 => 기하학적 변환
+    # src, dst의 관계를 계산하여 변환행렬을 반환
     M = cv2.getPerspectiveTransform(src, dst)
     Minv = cv2.getPerspectiveTransform(dst, src)
-    
-    warped = cv2.warpPerspective(img, M, (w,h), flags=cv2.INTER_LINEAR)
+
+    # 변환행렬으로 이미지를 기하학적으로 변환시킴
+    img_birdeye = cv2.warpPerspective(img, M, (w,h), flags=cv2.INTER_LINEAR)
     
     if verbose:
         f, axarray = plt.subplots(1, 2)
@@ -35,7 +38,7 @@ def birdeye(img, verbose=False):
             axarray[0].plot(*point, '.')
             
         axarray[1].set_title('After perspective transform')
-        axarray[1].imshow(warped, cmap='gray')
+        axarray[1].imshow(img_birdeye, cmap='gray')
         
         for point in dst:
             axarray[1].plot(*point, '.')
@@ -45,7 +48,7 @@ def birdeye(img, verbose=False):
         
         plt.show()
 
-    return warped, M, Minv
+    return img_birdeye, M, Minv
 
 
 if __name__ == "__main__":
