@@ -105,13 +105,11 @@ def process_pipeline(frame, keep_state=True):
     blend_on_road = draw_back_onto_the_road(img_undistorted, Minv, line_lt, line_rt, keep_state)
     
     # 썸네일(이진화, 상공뷰, 상공뷰 차선라인)
-    # 썸네일(이진화, 상공뷰, 상공뷰 차선라인)
     blend_output = prepare_out_blend_frame(blend_on_road, img_binary, img_birdeye, img_fit, line_lt, line_rt, offset_meter)
     
     processed_frames += 1
     
     return blend_output
-    # return blend_on_road
     # return blend_on_road
 
 
@@ -124,9 +122,7 @@ if __name__ == '__main__':
     
     if mode == 'video':
         input_path = 'project2_advanced_lane_detection_v2/test_videos/project_video.mp4'
-        input_path = 'project2_advanced_lane_detection_v2/test_videos/project_video.mp4'
         # input_path = 'project2_advanced_lane_detection_v2/test_videos/challenge_video.mp4'
-        # input_path = 'project2_advanced_lane_detection_v2/test_videos/harder_challenge_video.mp4'
         # input_path = 'project2_advanced_lane_detection_v2/test_videos/harder_challenge_video.mp4'
         
         cap = cv2.VideoCapture(input_path)
