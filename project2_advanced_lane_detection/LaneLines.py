@@ -95,6 +95,7 @@ class LaneLines:
         self.nonzerox = np.array(self.nonzero[1])
         self.nonzeroy = np.array(self.nonzero[0])
 
+
     def find_lane_pixels(self, img):
         """Find lane pixels from a binary warped image.
 
@@ -146,6 +147,9 @@ class LaneLines:
             if len(good_right_x) > self.minpix:
                 rightx_current = np.int32(np.mean(good_right_x))
 
+        # print(len(leftx),len(lefty))
+        # print(len(rightx),len(righty))
+        
         return leftx, lefty, rightx, righty, out_img
 
     def fit_poly(self, img):
@@ -160,12 +164,9 @@ class LaneLines:
         leftx, lefty, rightx, righty, out_img = self.find_lane_pixels(img)
 
         if len(lefty) > 1500:
-            self.left_fit = np.polyfit(lefty, leftx, 2)
+            self.left_fit = np.polyfit(lefty, leftx, 2) # 2차식으로 회귀값 찾기
         if len(righty) > 1500:
             self.right_fit = np.polyfit(righty, rightx, 2)
-            
-        # if self.left_fit == None:
-        #     return out_img
 
         # Generate x and y values for plotting
         maxy = img.shape[0] - 1
@@ -194,8 +195,10 @@ class LaneLines:
 
         return out_img
 
+
     def plot(self, out_img):
         np.set_printoptions(precision=6, suppress=True)
+        
         lR, rR, pos = self.measure_curvature()
 
         value = None
@@ -231,10 +234,12 @@ class LaneLines:
             y, x = self.left_curve_img[:,:,3].nonzero()
             out_img[y, x-100+W//2] = self.left_curve_img[y, x, :3]
             msg = "Left Curve Ahead"
+        
         if direction == 'R':
             y, x = self.right_curve_img[:,:,3].nonzero()
             out_img[y, x-100+W//2] = self.right_curve_img[y, x, :3]
             msg = "Right Curve Ahead"
+        
         if direction == 'F':
             y, x = self.keep_straight_img[:,:,3].nonzero()
             out_img[y, x-100+W//2] = self.keep_straight_img[y, x, :3]
@@ -250,7 +255,7 @@ class LaneLines:
             fontFace=cv2.FONT_HERSHEY_SIMPLEX,
             fontScale=1.2,
             color=(0, 255, 0),
-            thickness=2)
+        thickness=2)
 
         cv2.putText(
             out_img,

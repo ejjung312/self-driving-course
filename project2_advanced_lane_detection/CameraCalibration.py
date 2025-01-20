@@ -4,8 +4,8 @@ import glob
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 
-class CameraCalibration():
-    def __init__(self, image_dir, nx, ny, debug=False):
+class CameraCalibration:
+    def __init__(self, image_dir, nx, ny):
         fnames = glob.glob("{}/*".format(image_dir))
         objpoints = []
         imgpoints = []
@@ -37,4 +37,5 @@ class CameraCalibration():
     def undistort(self, img):
         # 카메라 왜곡 펴기
         gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+        
         return cv2.undistort(img, self.mtx, self.dist, None, self.mtx)
